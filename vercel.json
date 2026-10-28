@@ -2,10 +2,12 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "version": 2,
   "builds": [
-    {"src": "api/index.mjs", "use": "@vercel/node", "config": {"includeFiles": ["public/**", "storage.mjs"]}},
+    {"src": "api/index.mjs", "use": "@vercel/node", "config": {"includeFiles": ["public/**", "storage.mjs", "policy.mjs"]}},
     {"src": "public/**", "use": "@vercel/static"}
   ],
   "routes": [
+    {"src": "/(.*)", "headers": {"Content-Security-Policy": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'", "X-Content-Type-Options": "nosniff", "Referrer-Policy": "no-referrer", "Permissions-Policy": "camera=(), microphone=(), geolocation=()", "X-Frame-Options": "DENY"}, "continue": true},
+    {"src": "/(privacy|terms|copyright)", "dest": "/api/index.mjs"},
     {"src": "/api/(.*)", "dest": "/api/index.mjs"},
     {"src": "/", "dest": "/public/index.html"},
     {"src": "/(app.js|style.css)", "dest": "/public/$1"}

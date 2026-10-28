@@ -34,3 +34,9 @@ export async function downloadMaterial(id){
  const bytes=cloud?Buffer.from(await (await readBlob('materials/files/'+item.storage)).arrayBuffer()):await readFile(path.join(data,'files',item.storage));
  return {item,bytes};
 }
+export async function deleteMaterial(id){
+ requireStorage();
+ if(cloud){const item=await (await readBlob('materials/meta/'+id+'.json'))?.json();if(!item)return false;const {del}=await sdk();await del(['materials/files/'+item.storage,'materials/meta/'+id+'.json']);return true}
+ let found=false;
+ const task=queue.then(async()=>{const current=await localRecords(),item=current.find(r=>r.id===id);if(!item)return;const next=current.filter(r=>r.id!==id);await unlink(path.join(data,'files',item.storage)).catch(e=>{if(e.code!=='ENOENT')throw e});await writeFile(path.join(data,'materials.json.tmp'),JSON.stringify(next,null,2));await rename(path.join(data,'materials.json.tmp'),path.join(data,'materials.json'));records=next;found=true});queue=task.catch(()=>{});await task;return found;
+}
