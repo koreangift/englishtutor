@@ -13,7 +13,9 @@ export default async function handler(req,res){
   if(req.method==='GET'&&url.pathname==='/api/materials'){res.setHeader('Cache-Control','no-store');return send(res,200,(await listMaterials()).map(({storage,...r})=>r))}
   if(req.method==='POST'&&url.pathname==='/api/materials'){
    let body='',size=0;
-   for await(const chunk of req){size+=chunk.length;if(size>Math.ceil(maxFileSize*4/3)+65536)return send(res,413,{error:`파일은 ${maxFileSize/1024/1024}MB까지 업로드할 수 있습니다.`});body+=chunk;}
+   if(req.body!==undefined){body=typeof req.body==='string'?req.body:Buffer.isBuffer(req.body)?req.body.toString('utf8'):JSON.stringify(req.body);size=Buffer.byteLength(body)}
+   else for await(const chunk of req){size+=chunk.length;if(size>Math.ceil(maxFileSize*4/3)+65536)return send(res,413,{error:`파일은 ${maxFileSize/1024/1024}MB까지 업로드할 수 있습니다.`});body+=chunk;}
+   if(size>Math.ceil(maxFileSize*4/3)+65536)return send(res,413,{error:`파일은 ${maxFileSize/1024/1024}MB까지 업로드할 수 있습니다.`});
    let input;try{input=JSON.parse(body)}catch{return send(res,400,{error:'잘못된 요청입니다.'})}
    if(!input||typeof input!=='object')return send(res,400,{error:'잘못된 요청입니다.'});
    const {title,category,grade,description='',filename,base64}=input;
