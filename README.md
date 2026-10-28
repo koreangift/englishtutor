@@ -4,9 +4,10 @@
 
 ## 실행
 
-Node.js 20 이상에서 이 폴더를 터미널로 열고 실행하세요. 별도 패키지 설치는 필요 없습니다.
+Node.js 22에서 이 폴더를 터미널로 열고 실행하세요.
 
 ```sh
+npm install
 npm start
 ```
 
@@ -24,4 +25,17 @@ npm start
 소스 저장소: https://github.com/koreangift/englishtutor
 
 인터넷 배포는 별도로 필요합니다.
+
+## Vercel 배포
+
+저장소 루트의 `vercel.json`이 정적 페이지와 Node.js API를 각각 배포합니다. 홈페이지 표시에는 저장소 연결이 필요하지 않습니다. 파일을 업로드하려면 다음 설정이 필요합니다.
+
+1. Vercel의 englishtutor 프로젝트에서 Storage → Create Database → Blob을 선택합니다.
+2. **Private** 저장소를 만들고 프로젝트의 Production 환경에 연결합니다.
+3. `BLOB_READ_WRITE_TOKEN` 환경변수가 연결되었는지 확인합니다. 토큰은 소스 코드에 넣지 마세요.
+4. Deployments에서 최신 배포를 Redeploy합니다.
+
+Vercel에서는 자료 원본과 자료 정보가 Blob에 저장되어 재배포 후에도 유지됩니다. 저장소가 없으면 자료실 화면은 열리고 업로드 준비 중 안내가 표시됩니다. Vercel의 요청 본문 크기 제한에 맞춰 파일당 최대 3MB를 지원합니다. 로컬 서버는 기존 25MB 제한을 유지합니다.
+
+배포 확인: 홈페이지, `/api/config`, `/api/materials`가 응답하는지 확인하고, 작은 TXT 파일을 올려 다운로드를 검증하세요. 현재 관리자 인증은 없으므로 방문자도 업로드할 수 있습니다.
 
